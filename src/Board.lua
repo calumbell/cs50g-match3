@@ -49,6 +49,7 @@ end
     tiles of the same color. Doesn't need to check the last tile in every row or column if the 
     last two haven't been a match.
 ]]
+
 function Board:calculateMatches()
     local matches = {}
 
@@ -76,13 +77,26 @@ function Board:calculateMatches()
                 if matchNum >= 3 then
                     local match = {}
 
-                    -- go backwards from here by matchNum
+                    -- check if any tile in our match is shiny
+                    local shinyFound = false
                     for x2 = x - 1, x - matchNum, -1 do
-                        
-                        -- add each tile to the match that's in that match
-                        table.insert(match, self.tiles[y][x2])
+                        if self.tiles[y][x2].shiny then shinyFound = true end
                     end
 
+                    -- if shiny not found, add tiles to match
+                    if not shinyFound then
+                        -- go backwards from here by matchNum
+                        for x2 = x - 1, x - matchNum, -1 do
+                            -- add each tile to the match that's in that match
+                            table.insert(match, self.tiles[y][x2])
+                        end
+
+                    -- but if we have a shiny in the match, add all tiles in that row
+                    else
+                        for x2 = 1, 8 do
+                            table.insert(match, self.tiles[y][x2])
+                        end
+                    end
                     -- add this match to our total matches table
                     table.insert(matches, match)
                 end
@@ -100,9 +114,24 @@ function Board:calculateMatches()
         if matchNum >= 3 then
             local match = {}
             
-            -- go backwards from end of last row by matchNum
+            -- check if any tile in our match is shiny
+            local shinyFound = false
             for x = 8, 8 - matchNum + 1, -1 do
-                table.insert(match, self.tiles[y][x])
+                if self.tiles[y][x].shiny then shinyFound = true end
+            end
+
+            -- if shiny not found, add tiles to match
+            if not shinyFound then
+                -- go backwards from end of last row by matchNum
+                for x = 8, 8 - matchNum + 1, -1 do
+                    table.insert(match, self.tiles[y][x])
+                end
+
+            -- but if we have a shiny in the match, add all tiles in that row
+            else
+                for x = 1, 8 do
+                    table.insert(match, self.tiles[y][x])
+                end
             end
 
             table.insert(matches, match)
@@ -165,6 +194,8 @@ end
     Remove the matches from the Board by just setting the Tile slots within
     them to nil, then setting self.matches to nil.
 ]]
+
+
 function Board:removeMatches()
     for k, match in pairs(self.matches) do
         for k, tile in pairs(match) do
@@ -179,6 +210,7 @@ end
     Shifts down all of the tiles that now have spaces below them, then returns a table that
     contains tweening information for these new tiles.
 ]]
+
 function Board:getFallingTiles()
     -- tween table, with tiles as keys and their x and y as the to values
     local tweens = {}
