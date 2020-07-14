@@ -30,13 +30,13 @@ function Tile:init(x, y, color, variety)
     -- rarely, spawn a shiny block
     if math.random(25) == 1 then
         self.shiny = true
+        Tile:initParticleSystem()      
     else
         self.shiny = false
     end
 end
 
 function Tile:render(x, y)
-    
     -- draw shadow
     love.graphics.setColor(34, 32, 52, 255)
     love.graphics.draw(gTextures['main'], gFrames['tiles'][self.color][self.variety],
@@ -49,7 +49,32 @@ function Tile:render(x, y)
 
     -- if shiny, add something extra
     if self.shiny then
-        love.graphics.setColor(210, 210, 0, 100)
-        love.graphics.rectangle('fill', self.x + x, self.y + y, 32, 32, 8, 8)
+        self.psystem:emit(32)
+        love.graphics.draw(self.psystem, self.x + x + 16, self.y + y + 16)
     end
+end
+
+function Tile:update(dt)
+    if self.shiny then
+        self.psystem:update(dt)
+    end
+end
+
+
+-- method for setting up our particle system for shiny tiles
+function Tile:initParticleSystem()
+    self.psystem = love.graphics.newParticleSystem(gTextures['particle'], 32)
+    self.psystem:setParticleLifetime(0.5, 1)
+    self.psystem:setLinearAcceleration(-20, -20, 20, 20)
+    self.psystem:setAreaSpread('normal', 5, 5)
+    self.psystem:setColors(
+        255, -- r
+        255, -- g
+        255, -- b
+        100, -- a
+        255, -- r
+        255, -- g
+        255, -- b
+        0    -- a
+    )
 end
