@@ -71,10 +71,11 @@ function Tile:initParticleSystem()
         255, -- r
         255, -- g
         255, -- b
-        100, -- a
+        50, -- a
         255, -- r
         255, -- g
         255, -- b
         0    -- a
     )
+    self.psystem:setSizes(0.5, 0)
 end
