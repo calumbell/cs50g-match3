@@ -189,6 +189,7 @@ end
     have matched and replaces them with new randomized tiles, deferring most of this
     to the Board class.
 ]]
+
 function PlayState:calculateMatches()
     self.highlightedTile = nil
 
@@ -223,7 +224,6 @@ function PlayState:calculateMatches()
     -- if no matches, we can continue playing
     else
         self.canInput = true
-        print(self.board:checkForMoves())
     end
 end
 

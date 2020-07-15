@@ -48,7 +48,6 @@ BACKGROUND_SCROLL_SPEED = 80
 TILE_COLOURS_PER_BOARD = 8
 
 function love.load()
-    
     -- window bar title
     love.window.setTitle('Match 3')
 

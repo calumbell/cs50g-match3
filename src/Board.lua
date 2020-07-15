@@ -29,7 +29,10 @@ function Board:init(x, y, level)
         2 * math.random(0,1) + 15 -- purples
     }
     self:initializeTiles()
+    print(self:checkForMoves())
 end
+
+
 
 function Board:initializeTiles()
     self.tiles = {}
@@ -48,7 +51,7 @@ function Board:initializeTiles()
                 table.insert(self.tiles[tileY], Tile(tileX, tileY, self.colours[math.random(#self.colours)], 1))
             else
                 -- else, randomise tile variety (1-6)
-                table.insert(self.tiles[tileY], Tile(tileX, tileY, self.colours[math.random(8)], math.random(6)))
+                table.insert(self.tiles[tileY], Tile(tileX, tileY, self.colours[math.random(#self.colours)], math.random(6)))
             end
         end
     end
@@ -380,64 +383,103 @@ function Board:render()
 end
 
 function Board:checkForMoves()
-
     local tiles = self:createVirtualBoard(8)
     local centerTile = nil
 
     -- iterate across x + y in chunks of 2
-    for x = 1, 8, 2 do
-        for y = 1, 8, 2 do
+    for xi = 1, 7, 2 do
+        for yi = 1, 7, 2 do
 
             -- check for tile swaps at both (x, y) and (x+1, y+1) 
             for i = 0, 1 do
 
-                centerTile = tiles[y+i][x+i]
+                local x = xi + i
+                local y = yi + i
 
-                if x + i < 8 then
-                    -- swap with tile to the right
-                    tiles[y+i][x+i] = tiles[y+i][x+i+1]
-                    tiles[y+i][x+i+1] = centerTile
-                
-                    -- check for matches in row y and columns x, x+1
-                    if self:checkForMatchInRow(y+i, tiles, math.max(x+i-2, 1), math.min(x+i+3, 8)) then
-                        return true
-                    elseif self:checkForMatchInColumn(x+i, tiles, math.max(y+i-2, 1), math.min(y+i+2, 8)) then
-                        return true
-                    elseif self:checkForMatchInColumn(x+i+1, tiles, math.max(y+i-2, 1), math.min(y+i+2, 8)) then
-                        return true
+                centerTile = tiles[y][x]
+
+                if x > 1 then
+                    -- swap with tile to the left
+                    tiles[y][x] = tiles[y][x-1]
+                    tiles[y][x-1] = centerTile
+
+                    -- check for matches in row y and columns x, x-1
+                    if self:checkForMatchInRow(y, tiles, math.max(x-2, 1), math.min(x+3, 8)) then
+                        return tiles[y][x]
+                    elseif self:checkForMatchInColumn(x, tiles, math.max(y-2, 1), math.min(y+2, 8)) then
+                        return tiles[y][x]
+                    elseif self:checkForMatchInColumn(x-1, tiles, math.max(y-2, 1), math.min(y+2, 8)) then
+                        return tiles[y][x]
                     end
 
                     -- reset the board
-                    tiles[y+i][x+i+1] = tiles[y+i][x+i]
-                    tiles[y+i][x+i] = centerTile
+                    tiles[y][x-1] = tiles[y][x]
+                    tiles[y][x] = centerTile
+                end
+
+                if x < 8 then
+                    -- swap with tile to the right
+                    tiles[y][x] = tiles[y][x+1]
+                    tiles[y][x+1] = centerTile
+                
+                    -- check for matches in row y and columns x, x+1
+                    if self:checkForMatchInRow(y, tiles, math.max(x-2, 1), math.min(x+3, 8)) then
+                        return tiles[y][x]
+                    elseif self:checkForMatchInColumn(x, tiles, math.max(y-2, 1), math.min(y+2, 8)) then
+                        return tiles[y][x]
+                    elseif self:checkForMatchInColumn(x+1, tiles, math.max(y-2, 1), math.min(y+2, 8)) then
+                        return tiles[y][x]
+                    end
+
+                    -- reset the board
+                    tiles[y][x+1] = tiles[y][x]
+                    tiles[y][x] = centerTile
+                end
+
+                if y > 1 then
+                    -- swap with tile above
+                    tiles[y][x] = tiles[y-1][x]
+                    tiles[y-1][x] = centerTile
+
+                    -- check for matches in row y and columns x, x-1
+                    if self:checkForMatchInRow(y, tiles, math.max(x-2, 1), math.min(x+3, 8)) then
+                        return tiles[y][x]
+                    elseif self:checkForMatchInRow(y-1, tiles, math.max(y-2, 1), math.min(y+3, 8)) then
+                        return tiles[y][x]
+                    elseif self:checkForMatchInColumn(x, tiles, math.max(y-2, 1), math.min(y+2, 8)) then
+                        return tiles[y][x]
+                    end
+
+                    -- reset the board
+                    tiles[y-1][x] = tiles[y][x]
+                    tiles[y][x] = centerTile
                 end
 
 
-
-                -- make sure that we aren't at the bottom of the grid
-                if y + i < 8 then
+                if y < 8 then
                     -- swap with tile below
-                    tiles[y+i][x+i] = tiles[y+i+1][x+i]
-                    tiles[y+i+1][x+i] = centerTile
+                    tiles[y][x] = tiles[y+1][x]
+                    tiles[y+1][x] = centerTile
 
                     -- check for matches in rows y, y+1 and column x
-                    if self:checkForMatchInRow(y+i, tiles, math.max(x+i-2, 1), math.min(x+i+2, 8)) then
-                        return true
-                    elseif self:checkForMatchInRow(y+i+1, tiles, math.max(x+i-2, 1), math.min(x+i+2, 8)) then
-                        return true
-                    elseif self:checkForMatchInColumn(x+i, tiles, math.max(y+i-2, 1), math.min(y+i+3, 8)) then
-                        return true
+                    if self:checkForMatchInRow(y, tiles, math.max(x-2, 1), math.min(x+2, 8)) then
+                        return tiles[y][x]
+                    elseif self:checkForMatchInRow(y+1, tiles, math.max(x-2, 1), math.min(x+2, 8)) then
+                        return tiles[y][x]
+                    elseif self:checkForMatchInColumn(x, tiles, math.max(y-2, 1), math.min(y+3, 8)) then
+                        return tiles[y][x]
                     end
 
                     -- reset board
-                    tiles[y+i+1][x+i] = tiles[y+i][x+1]
-                    tiles[y+i][x+i] = centerTile
+                    tiles[y+1][x] = tiles[y][x]
+                    tiles[y][x] = centerTile
                 end
             end
         end
     end
 
     return false
+
 end
 
 
@@ -449,6 +491,8 @@ function Board:checkForMatchInRow(y, tiles, x1, x2)
     -- determine start and end points of row
     local start = x1 or 1
     local finish = x2 or 8
+
+    if start == finish then return false end
 
     -- lastColor keeps track of the color we are trying to match
     local lastColor = tiles[y][start].color
@@ -488,6 +532,8 @@ function Board:checkForMatchInColumn(x, tiles, y1, y2)
     -- determine start and end points of column
     local start = y1 or 1
     local finish = y2 or 8
+
+    if start == finish then return false end
 
     -- lastColor keeps track of the color we are trying to match
     local lastColor = tiles[start][x].color
