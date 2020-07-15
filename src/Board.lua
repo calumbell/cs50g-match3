@@ -393,15 +393,19 @@ end
     Searches a given row (y) of a 2D array of tiles for matches
     Return true if one if found, else returns false
 ]]
-function Board:checkForMatchInRow(y, tiles)
+function Board:checkForMatchInRow(y, tiles, x1, x2)
+    -- determine start and end points of row
+    local start = x1 or 1
+    local finish = x2 or 8
+
     -- lastColor keeps track of the color we are trying to match
-    local lastColor = tiles[y][1].color
+    local lastColor = tiles[y][start].color
 
     -- colorsMatched keeps track of how many colors we have matched so far
     local colorsMatched = 1
 
     -- iterate over row
-    for x = 2, 8 do
+    for x = start + 1, finish do
 
         if tiles[y][x].color == lastColor then
 
@@ -425,16 +429,23 @@ end
 --[[
     Searches a given column (x) of a 2D array of tiles for matches
     Return true if one if found, else returns false
+    If we only want to check a subsection of a column, use the optional
+    first and last arguments.
 ]]
-function Board:checkForMatchInColumn(x, tiles)
+function Board:checkForMatchInColumn(x, tiles, y1, y2)
+    -- determine start and end points of column
+    local start = y1 or 1
+    local finish = y2 or 8
+
     -- lastColor keeps track of the color we are trying to match
-    local lastColor = tiles[1][x].color
+    local lastColor = tiles[start][x].color
 
     -- colorsMatched keeps track of how many colors we have matched so far
     local colorsMatched = 1
 
+
     -- iterate over row
-    for y = 2, 8 do
+    for y = start+1, finish do
 
         if tiles[y][x].color == lastColor then
 
