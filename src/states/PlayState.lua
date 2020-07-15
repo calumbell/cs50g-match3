@@ -141,6 +141,10 @@ function PlayState:update(dt)
             elseif math.abs(self.highlightedTile.gridX - x) + math.abs(self.highlightedTile.gridY - y) > 1 then
                 gSounds['error']:play()
                 self.highlightedTile = nil
+            
+            elseif not self.board:checkForMatch(x, y, self.highlightedTile.gridX, self.highlightedTile.gridY) then
+                gSounds['error']:play()
+                self.highlightedTile = nil
             else
                 
                 -- swap grid positions of tiles

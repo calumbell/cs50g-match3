@@ -253,6 +253,124 @@ function Board:removeMatches()
 end
 
 --[[
+    Returns true if swapping the tiles at the two sets of coordinates returns in a match
+    otherwise returns false.
+]]
+function Board:checkForMatch(x1, y1, x2, y2)
+    -- create a virtual board for testing
+    local vBoard = {}
+
+    for y = 1, 8 do
+        table.insert(vBoard, {})
+        for x = 1, 8 do
+            table.insert(vBoard[y], Tile(x, y, self.tiles[y][x].color, 1))
+        end
+    end
+
+    -- swap tiles at (x1, y1) and (x2, y2)
+    local tempTile = vBoard[y1][x1]
+    vBoard[y1][x1] = vBoard[y2][x2]
+    vBoard[y2][x2] = tempTile
+    
+    -- lastColor keeps track of the color we are trying to match
+    local lastColor = vBoard[1][x1].color
+
+    -- colorsMatched keeps track of how many colors we have matched so far
+    local colorsMatched = 1
+
+    -- iterate over column x1
+    for y = 2, 8 do
+
+        print(tostring(lastColor) ..": ".. tostring(vBoard[y][x1].color))
+        if vBoard[y][x1].color == lastColor then
+
+            -- the colors match, increment colorsMatched
+            colorsMatched = colorsMatched + 1
+
+            -- if we match 3 colors, return true
+            if colorsMatched >= 3 then
+                return true
+            end
+        else
+            -- if there isn't a match, reset our variables
+            colorsMatched = 1
+            lastColor = vBoard[y][x1].color
+        end
+    end
+
+    -- re-init variables
+    lastColor = vBoard[y1][1].color
+    colorsMatched = 1
+
+    -- iterate over row y1
+    for x = 2, 8 do
+        if vBoard[y1][x].color == lastColor then
+
+            -- the colors match, increment colorsMatched
+            colorsMatched = colorsMatched + 1
+
+            -- if we match 3 colors, return true
+            if colorsMatched >= 3 then
+                return true
+            end
+        else
+            -- if there isn't a match, reset our variables
+            colorsMatched = 1
+            lastColor = vBoard[y1][x].color
+        end
+    end      
+
+    -- if it is a vertical swap, check row y2
+    if x1 == x2 then
+
+        lastColor = vBoard[y2][1].color
+        colorsMatched = 1
+
+        -- iterate over row y1
+        for x = 2, 8 do
+            if vBoard[y2][x].color == lastColor then
+
+                -- the colors match, increment colorsMatched
+                colorsMatched = colorsMatched + 1
+
+                -- if we match 3 colors, return true
+                if colorsMatched >= 3 then
+                    return true
+                end
+            else
+                -- if there isn't a match, reset our variables
+                colorsMatched = 1
+                lastColor = vBoard[y2][x].color
+            end
+        end  
+    -- else it is a horizontal swap, check column x2
+    else
+        lastColor = vBoard[1][x2].color
+        colorsMatched = 1
+
+        for y = 2, 8 do
+
+            if vBoard[y][x1].color == lastColor then
+
+                -- the colors match, increment colorsMatched
+                colorsMatched = colorsMatched + 1
+
+                -- if we match 3 colors, return true
+                if colorsMatched >= 3 then
+                    return true
+                end
+            else
+                -- if there isn't a match, reset our variables
+                colorsMatched = 1
+                lastColor = vBoard[y][x1].color
+            end
+        end        
+    end
+
+    return false
+end
+
+--[[
     Shifts down all of the tiles that now have spaces below them, then returns a table that
     contains tweening information for these new tiles.
 ]]
