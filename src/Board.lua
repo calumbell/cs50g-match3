@@ -274,103 +274,22 @@ function Board:checkForMatch(x1, y1, x2, y2)
     local tempTile = vBoard[y1][x1]
     vBoard[y1][x1] = vBoard[y2][x2]
     vBoard[y2][x2] = tempTile
-    
-    -- lastColor keeps track of the color we are trying to match
-    local lastColor = vBoard[1][x1].color
 
-    -- colorsMatched keeps track of how many colors we have matched so far
-    local colorsMatched = 1
-
-    -- iterate over column x1
-    for y = 2, 8 do
-
-        print(tostring(lastColor) ..": ".. tostring(vBoard[y][x1].color))
-        if vBoard[y][x1].color == lastColor then
-
-            -- the colors match, increment colorsMatched
-            colorsMatched = colorsMatched + 1
-
-            -- if we match 3 colors, return true
-            if colorsMatched >= 3 then
-                return true
-            end
-        else
-            -- if there isn't a match, reset our variables
-            colorsMatched = 1
-            lastColor = vBoard[y][x1].color
-        end
-    end
+    local matchFound = false
 
     -- re-init variables
-    lastColor = vBoard[y1][1].color
-    colorsMatched = 1
-
-    -- iterate over row y1
-    for x = 2, 8 do
-        if vBoard[y1][x].color == lastColor then
-
-            -- the colors match, increment colorsMatched
-            colorsMatched = colorsMatched + 1
-
-            -- if we match 3 colors, return true
-            if colorsMatched >= 3 then
-                return true
-            end
-        else
-            -- if there isn't a match, reset our variables
-            colorsMatched = 1
-            lastColor = vBoard[y1][x].color
-        end
-    end      
-
+    matchFound = matchFound or self:checkForMatchInRow(y1, vBoard)  
+    matchFound = matchFound or self:checkForMatchInColumn(x1, vBoard)
     -- if it is a vertical swap, check row y2
     if x1 == x2 then
+        matchFound = matchFound or self:checkForMatchInColumn(y2, vBoard)
 
-        lastColor = vBoard[y2][1].color
-        colorsMatched = 1
-
-        -- iterate over row y1
-        for x = 2, 8 do
-            if vBoard[y2][x].color == lastColor then
-
-                -- the colors match, increment colorsMatched
-                colorsMatched = colorsMatched + 1
-
-                -- if we match 3 colors, return true
-                if colorsMatched >= 3 then
-                    return true
-                end
-            else
-                -- if there isn't a match, reset our variables
-                colorsMatched = 1
-                lastColor = vBoard[y2][x].color
-            end
-        end  
     -- else it is a horizontal swap, check column x2
     else
-        lastColor = vBoard[1][x2].color
-        colorsMatched = 1
-
-        for y = 2, 8 do
-
-            if vBoard[y][x1].color == lastColor then
-
-                -- the colors match, increment colorsMatched
-                colorsMatched = colorsMatched + 1
-
-                -- if we match 3 colors, return true
-                if colorsMatched >= 3 then
-                    return true
-                end
-            else
-                -- if there isn't a match, reset our variables
-                colorsMatched = 1
-                lastColor = vBoard[y][x1].color
-            end
-        end        
+        matchFound = matchFound or self:checkForMatchInRow(x2, vBoard) 
     end
 
-    return false
+    return matchFound
 end
 
 --[[
@@ -468,4 +387,70 @@ function Board:render()
             self.tiles[y][x]:render(self.x, self.y)
         end
     end
+end
+
+--[[
+    Searches a given row (y) of a 2D array of tiles for matches
+    Return true if one if found, else returns false
+]]
+function Board:checkForMatchInRow(y, tiles)
+    -- lastColor keeps track of the color we are trying to match
+    local lastColor = tiles[y][1].color
+
+    -- colorsMatched keeps track of how many colors we have matched so far
+    local colorsMatched = 1
+
+    -- iterate over row
+    for x = 2, 8 do
+
+        if tiles[y][x].color == lastColor then
+
+            -- the colors match, increment colorsMatched
+            colorsMatched = colorsMatched + 1
+
+            -- if we match 3 colors, return true
+            if colorsMatched >= 3 then
+                return true
+            end
+        else
+            -- if there isn't a match, reset our variables
+            colorsMatched = 1
+            lastColor = tiles[y][x].color
+        end
+    end
+
+    return false
+end
+
+--[[
+    Searches a given column (x) of a 2D array of tiles for matches
+    Return true if one if found, else returns false
+]]
+function Board:checkForMatchInColumn(x, tiles)
+    -- lastColor keeps track of the color we are trying to match
+    local lastColor = tiles[1][x].color
+
+    -- colorsMatched keeps track of how many colors we have matched so far
+    local colorsMatched = 1
+
+    -- iterate over row
+    for y = 2, 8 do
+
+        if tiles[y][x].color == lastColor then
+
+            -- the colors match, increment colorsMatched
+            colorsMatched = colorsMatched + 1
+
+            -- if we match 3 colors, return true
+            if colorsMatched >= 3 then
+                return true
+            end
+        else
+            -- if there isn't a match, reset our variables
+            colorsMatched = 1
+            lastColor = tiles[y][x].color
+        end
+    end
+
+    return false
 end
