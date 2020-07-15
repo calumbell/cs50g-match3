@@ -14,19 +14,22 @@
 Board = Class{}
 
 function Board:init(x, y, level)
+
+
+
     self.x = x
     self.y = y
     self.matches = {}
     self.level = level
     self.colours = {
-        math.random(1,3), 
-        math.random(4,5),
-        math.random(6,7),
-        math.random(8,9),
-        math.random(10,11),
-        math.random(12,13),
-        math.random(14,15),
-        math.random(16,18)
+        2 * math.random(2), -- pinks
+        2 * math.random(0,2) + 1, -- brown/green
+        2 * math.random(0,1) + 6, -- reds
+        2 * math.random(0,1) + 7, -- brighter greens
+        2 * math.random(0,1) + 10, -- orange/brown
+        2 * math.random(0,1) + 11, -- blues
+        2 * math.random(0,2) + 14, -- greys
+        2 * math.random(0,1) + 15 -- purples
     }
     self:initializeTiles()
 end
