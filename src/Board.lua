@@ -14,9 +14,6 @@
 Board = Class{}
 
 function Board:init(x, y, level)
-
-
-
     self.x = x
     self.y = y
     self.matches = {}
@@ -33,6 +30,8 @@ function Board:init(x, y, level)
     }
     self:initializeTiles()
 end
+
+
 
 function Board:initializeTiles()
     self.tiles = {}
@@ -261,14 +260,7 @@ end
 ]]
 function Board:checkForMatch(x1, y1, x2, y2)
     -- create a virtual board for testing
-    local vBoard = {}
-
-    for y = 1, 8 do
-        table.insert(vBoard, {})
-        for x = 1, 8 do
-            table.insert(vBoard[y], Tile(x, y, self.tiles[y][x].color, 1))
-        end
-    end
+    local vBoard = self:createVirtualBoard(8)
 
     -- swap tiles at (x1, y1) and (x2, y2)
     local tempTile = vBoard[y1][x1]
@@ -277,17 +269,14 @@ function Board:checkForMatch(x1, y1, x2, y2)
 
     local matchFound = false
 
-    -- re-init variables
+    -- check for matches starting at (x1, y1)
     matchFound = matchFound or self:checkForMatchInRow(y1, vBoard)  
     matchFound = matchFound or self:checkForMatchInColumn(x1, vBoard)
-    -- if it is a vertical swap, check row y2
-    if x1 == x2 then
-        matchFound = matchFound or self:checkForMatchInColumn(y2, vBoard)
 
-    -- else it is a horizontal swap, check column x2
-    else
-        matchFound = matchFound or self:checkForMatchInRow(x2, vBoard) 
-    end
+    -- check for matches starting at (x2, y2)
+    matchFound = matchFound or self:checkForMatchInRow(y2, vBoard)
+    matchFound = matchFound or self:checkForMatchInColumn(x2, vBoard) 
+
 
     return matchFound
 end
@@ -389,6 +378,11 @@ function Board:render()
     end
 end
 
+function Board:movesRemaining()
+
+end
+
+
 --[[
     Searches a given row (y) of a 2D array of tiles for matches
     Return true if one if found, else returns false
@@ -464,4 +458,23 @@ function Board:checkForMatchInColumn(x, tiles, y1, y2)
     end
 
     return false
+end
+
+--[[
+    Returns a copy of the current board, useful for checking for swaps without
+    updating the game board
+]]
+
+function Board:createVirtualBoard(size)
+    -- create a virtual board for testing
+    local virtualBoard = {}
+
+    for y = 1, size do
+        table.insert(virtualBoard, {})
+        for x = 1, size do
+            table.insert(virtualBoard[y], Tile(x, y, self.tiles[y][x].color, 1))
+        end
+    end
+
+    return virtualBoard
 end
