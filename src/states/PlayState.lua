@@ -223,6 +223,7 @@ function PlayState:calculateMatches()
     -- if no matches, we can continue playing
     else
         self.canInput = true
+        print(self.board:checkForMoves())
     end
 end
 
