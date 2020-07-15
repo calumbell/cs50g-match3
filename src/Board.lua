@@ -25,11 +25,13 @@ end
 function Board:initializeTiles()
     self.tiles = {}
 
+    -- iterate over rows
     for tileY = 1, 8 do
         
         -- empty table that will serve as a new row
         table.insert(self.tiles, {})
 
+        -- iterate over tiles in a row
         for tileX = 1, 8 do
             
             if self.level == 1 then
@@ -160,8 +162,23 @@ function Board:calculateMatches()
                 if matchNum >= 3 then
                     local match = {}
 
+                    -- check if any tile in our match is shiny
+                    local shinyFound = false
                     for y2 = y - 1, y - matchNum, -1 do
-                        table.insert(match, self.tiles[y2][x])
+                        if self.tiles[y2][x].shiny then shinyFound = true end
+                    end
+
+                    -- if we found no shiny in the match, remove the matched tiles
+                    if not shinyFound then
+                        for y2 = y - 1, y - matchNum, -1 do
+                            table.insert(match, self.tiles[y2][x])
+                        end
+
+                    -- if we found a shiny remove the whole row
+                    else
+                        for y2 = 1, 8 do
+                            table.insert(match, self.tiles[y2][x])
+                        end
                     end
 
                     table.insert(matches, match)
@@ -180,9 +197,23 @@ function Board:calculateMatches()
         if matchNum >= 3 then
             local match = {}
             
-            -- go backwards from end of last row by matchNum
-            for y = 8, 8 - matchNum + 1, -1 do
-                table.insert(match, self.tiles[y][x])
+            local shinyFound = false
+            for y2 = 8, 8 - matchNum + 1, -1 do
+                if self.tiles[y2][x].shiny then shinyFound = true end
+            end
+
+            -- if there is no shiny in match, remove all tiles in the match
+            if not shinyFound then
+                -- go backwards from end of last row by matchNum
+                for y2 = 8, 8 - matchNum + 1, -1 do
+                    table.insert(match, self.tiles[y2][x])
+                end
+
+            -- if we found a shiny remove the whole column
+            else
+                for y2 = 1, 8 do
+                    table.insert(match, self.tiles[y2][x])
+                end
             end
 
             table.insert(matches, match)
