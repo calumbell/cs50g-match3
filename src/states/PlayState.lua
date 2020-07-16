@@ -173,6 +173,19 @@ function PlayState:update(dt)
                 -- once the swap is finished, we can tween falling blocks as needed
                 :finish(function()
                     self:calculateMatches()
+
+                    -- check if there are any moves possible with new board
+                    if not self.board:checkForMoves() then
+                        print('no moves possible!')
+                        self.canInput = false
+
+                        -- if not, wait & reinit tiles
+                        Timer.after(1, function()
+                            self.board:initializeTiles()
+                            self.canInput = true
+                        end)
+                    end
+
                 end)
             end
         end
