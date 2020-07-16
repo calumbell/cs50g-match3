@@ -28,8 +28,10 @@ function Board:init(x, y, level)
         2 * math.random(0,2) + 14, -- greys
         2 * math.random(0,1) + 15 -- purples
     }
+
+    self.transitionAlpha = 255
+
     self:initializeTiles()
-    print(self:checkForMoves())
 end
 
 
@@ -64,6 +66,18 @@ function Board:initializeTiles()
     end
 end
 
+
+function Board:reinitializeTiles()
+    Timer.tween(1, {
+        [self] = {transitionAlpha = 0}
+    })
+    :finish(function ()
+        self:initializeTiles()
+        Timer.tween(1, {
+            [self] = {transitionAlpha = 255}
+        })
+    end)
+end
 --[[
     Goes left to right, top to bottom in the board, calculating matches by counting consecutive
     tiles of the same color. Doesn't need to check the last tile in every row or column if the 
@@ -377,7 +391,7 @@ end
 function Board:render()
     for y = 1, #self.tiles do
         for x = 1, #self.tiles[1] do
-            self.tiles[y][x]:render(self.x, self.y)
+            self.tiles[y][x]:render(self.x, self.y, self.transitionAlpha)
         end
     end
 end
@@ -487,6 +501,7 @@ end
     Searches a given row (y) of a 2D array of tiles for matches
     Return true if one if found, else returns false
 ]]
+
 function Board:checkForMatchInRow(y, tiles, x1, x2)
     -- determine start and end points of row
     local start = x1 or 1

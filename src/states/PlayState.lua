@@ -174,14 +174,14 @@ function PlayState:update(dt)
                 :finish(function()
                     self:calculateMatches()
 
-                    -- check if there are any moves possible with new board
+                    -- check if there are no moves possible with new board
                     if not self.board:checkForMoves() then
                         print('no moves possible!')
                         self.canInput = false
 
-                        -- if not, wait & reinit tiles
-                        Timer.after(1, function()
-                            self.board:initializeTiles()
+                        self.board:reinitializeTiles()
+
+                        Timer.after(2.5, function()
                             self.canInput = true
                         end)
                     end
