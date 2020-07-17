@@ -20,10 +20,8 @@ function Board:init(x, y, level)
     self.level = level
     self.colours = {
         -- debug colours
-        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
-
-
-        --[[
+        -- 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+       
         2 * math.random(2), -- pinks
         2 * math.random(0,2) + 1, -- brown/green
         2 * math.random(0,1) + 6, -- reds
@@ -31,7 +29,7 @@ function Board:init(x, y, level)
         2 * math.random(0,1) + 10, -- orange/brown
         2 * math.random(0,1) + 11, -- blues
         2 * math.random(0,2) + 14, -- greys
-        2 * math.random(0,1) + 15 -- purples ]]
+        2 * math.random(0,1) + 15 -- purples
     }
 
     self.transitionAlpha = 255
