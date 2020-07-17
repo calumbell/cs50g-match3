@@ -21,6 +21,8 @@ push = require 'lib/push'
 -- used for timers and tweening
 Timer = require 'lib/knife.timer'
 
+Chain = require 'lib/knife.chain'
+
 --
 -- our own code
 --

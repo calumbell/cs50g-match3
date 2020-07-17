@@ -1,5 +1,7 @@
 ResetBoardState = Class{__includes = BaseState}
 
+-- Virtual methods inherited from BaseState
+
 function ResetBoardState:init()
 	self.transitionAlpha = 0
 	self.labelY = -64
@@ -11,25 +13,8 @@ function ResetBoardState:enter(params)
 	self.score = params.score
 	self.level = params.level
 	
-	Timer.tween(0.25, {
-		[self] = {transitionAlpha = 255},
-		[self] = {labelY = VIRTUAL_HEIGHT / 2}
-	}):finish(function()
-		Timer.after(0.75, function()
-			self.board:initializeTiles()
-	        Timer.tween(0.5, {
-	            [self] = {transitionAlpha = 0},
-	            [self] = {labelY = VIRTUAL_HEIGHT + 64}
-	        }):finish(function()
-	    		gStateMachine:change('play', {
-	    			board = self.board,
-	    			timer = self.timer,
-	    			score = self.score,
-	    			level = self.level
-	    		})
-	    	end)
-		end)
-	end)
+	self:animateAndReturn()
+
 end
 
 function ResetBoardState:update(dt)
@@ -53,3 +38,45 @@ function ResetBoardState:render()
     love.graphics.printf('No Matches Left!',
         0, self.labelY, VIRTUAL_WIDTH, 'center')
 end
+
+
+-- Helper functions
+
+-- animateAndReturn runs all of the asynchronious logic for the ResetBoardState.
+-- The background is whited out, text is animated, and finally we return to the PlayState
+
+
+function ResetBoardState:animateAndReturn()
+	Chain(
+		function(go)
+			Timer.tween(0.25, {
+				[self] = {transitionAlpha = 255},
+				[self] = {labelY = VIRTUAL_HEIGHT / 2}
+			})
+			Timer.after(0.25, go)
+		end,
+
+		function(go)
+			self.board:initializeTiles()
+			Timer.after(0.75, go)
+		end,
+
+		function(go)
+			Timer.tween(0.75, {
+				[self] = {transitionAlpha = 0},
+				[self] = {labelY = VIRTUAL_HEIGHT +64}
+			})
+			Timer.after(0.75, go)
+		end,
+
+		function(go)
+			gStateMachine:change('play', {
+	    		board = self.board,
+	    		timer = self.timer,
+	    		score = self.score,
+	    		level = self.level
+	    	})
+	    end
+	)()
+end
+
