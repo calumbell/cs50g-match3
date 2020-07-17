@@ -91,21 +91,16 @@ function StartState:update(dt)
             self.pauseInput = true
         end
 
-        if  mouseDown then
-            local mouseX, mouseY = push:toGame(love.mouse.getX(), love.mouse.getY())
-            
-            -- click 'start game' -> begin the game
-            -- button dims. x: 230-286, y: 160-181
-            if 230 < mouseX and mouseX < 286 and 160 < mouseY and mouseY < 181 then
-                self:beginGame()
+        local mouseX, mouseY = push:toGame(love.mouse.getX(), love.mouse.getY())
 
-            -- click 'quit' --> quit the game
-            -- button dims. x: 211-300, y: 190-205
-            elseif 211 < mouseX and mouseX < 300 and 190 < mouseY and mouseY < 205 then
-                love.event.quit()
-            end
-
+        if 230 < mouseX and mouseX < 286 and 160 < mouseY and mouseY < 181 then
+            self.currentMenuItem = 1
+            if  mouseDown then self:beginGame() end
+        elseif 211 < mouseX and mouseX < 300 and 190 < mouseY and mouseY < 205 then
+            self.currentMenuItem = 2
+            if mouseDown then love.event.quit() end
         end
+
     end
 
     -- update our Timer, which will be used for our fade transitions
@@ -141,6 +136,10 @@ function StartState:render()
     love.graphics.setColor(255, 255, 255, self.transitionAlpha)
     love.graphics.rectangle('fill', 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
 end
+
+--[[
+  Fades to white and begins the game  
+]]
 
 function StartState:beginGame()
 
