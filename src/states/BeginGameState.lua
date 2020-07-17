@@ -38,37 +38,42 @@ function BeginGameState:enter(def)
     -- the level text
     --
 
-    -- first, over a period of 1 second, transition our alpha to 0
-    Timer.tween(1, {
-        [self] = {transitionAlpha = 0}
-    })
+    Chain(
+        -- first, over a period of 1 second, transition our alpha to 0
+        function(go)
+            Timer.tween(1, {
+                [self] = {transitionAlpha = 0}
+            })
+            Timer.after(1, go)
+        end,
+
+        -- once that's finished, start a transition of our text label to
+        -- the center of the screen over 0.25 seconds
+        function(go)
+            Timer.tween(0.25, {
+                [self] = {levelLabelY = VIRTUAL_HEIGHT / 2 - 8}
+            })
+            Timer.after(1.25, go)
+        end,
+
+        -- once that's finished, start a transition of our text label to
+        -- the center of the screen over 0.25 seconds
+        function(go)
+            Timer.tween(0.25, {
+                [self] = {levelLabelY = VIRTUAL_HEIGHT + 30}
+            })
+            Timer.after(0.25, go)
+        end,
+
+        -- once that's complete, we're ready to play!
+        function(go)
+            gStateMachine:change('play', {
+                level = self.level,
+                board = self.board
+            })
+        end
+    )()
     
-    -- once that's finished, start a transition of our text label to
-    -- the center of the screen over 0.25 seconds
-    :finish(function()
-        Timer.tween(0.25, {
-            [self] = {levelLabelY = VIRTUAL_HEIGHT / 2 - 8}
-        })
-        
-        -- after that, pause for one second with Timer.after
-        :finish(function()
-            Timer.after(1, function()
-                
-                -- then, animate the label going down past the bottom edge
-                Timer.tween(0.25, {
-                    [self] = {levelLabelY = VIRTUAL_HEIGHT + 30}
-                })
-                
-                -- once that's complete, we're ready to play!
-                :finish(function()
-                    gStateMachine:change('play', {
-                        level = self.level,
-                        board = self.board
-                    })
-                end)
-            end)
-        end)
-    end)
 end
 
 function BeginGameState:update(dt)
