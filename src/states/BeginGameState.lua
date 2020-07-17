@@ -19,8 +19,6 @@ function BeginGameState:init()
     -- start our transition alpha at full, so we fade in
     self.transitionAlpha = 255
 
-
-
     -- start our level # label off-screen
     self.levelLabelY = -64
 end
@@ -65,7 +63,7 @@ function BeginGameState:enter(def)
             Timer.after(0.25, go)
         end,
 
-        -- once that's complete, we're ready to play!
+        -- once that's complete, we're ready to plÍay!
         function(go)
             gStateMachine:change('play', {
                 level = self.level,
@@ -73,7 +71,7 @@ function BeginGameState:enter(def)
             })
         end
     )()
-    
+
 end
 
 function BeginGameState:update(dt)

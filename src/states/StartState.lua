@@ -81,20 +81,8 @@ function StartState:update(dt)
 
         -- switch to another state via one of the menu options
         if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
-            if self.currentMenuItem == 1 then
-                
-                -- tween, using Timer, the transition rect's alpha to 255, then
-                -- transition to the BeginGame state after the animation is over
-                Timer.tween(1, {
-                    [self] = {transitionAlpha = 255}
-                }):finish(function()
-                    gStateMachine:change('begin-game', {
-                        level = 1
-                    })
-
-                    -- remove color timer from Timer
-                    self.colorTimer:remove()
-                end)
+            if self.currentMenuItem == 1 then               
+                self:beginGame()
             else
                 love.event.quit()
             end
@@ -136,6 +124,21 @@ function StartState:render()
     -- draw our transition rect; is normally fully transparent, unless we're moving to a new state
     love.graphics.setColor(255, 255, 255, self.transitionAlpha)
     love.graphics.rectangle('fill', 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
+end
+
+function StartState:beginGame()
+
+    -- fade to white, then change to game state
+    Timer.tween(1, {
+        [self] = {transitionAlpha = 255}
+    }):finish(function()
+        gStateMachine:change('begin-game', {
+            level = 1
+        })
+
+        -- remove color timer from Timer
+        self.colorTimer:remove()
+    end)
 end
 
 --[[
@@ -198,6 +201,7 @@ end
     Helper function for drawing just text backgrounds; draws several layers of the same text, in
     black, over top of one another for a thicker shadow.
 ]]
+
 function StartState:drawTextShadow(text, y)
     love.graphics.setColor(34, 32, 52, 255)
     love.graphics.printf(text, 2, y + 1, VIRTUAL_WIDTH, 'center')

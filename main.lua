@@ -47,6 +47,9 @@ BACKGROUND_SCROLL_SPEED = 80
 -- how many different colours of tiles to include in each board
 TILE_COLOURS_PER_BOARD = 8
 
+-- global variable for keeping track of when the mouse is pressed
+mouse = false
+
 function love.load()
     -- window bar title
     love.window.setTitle('Match 3')
@@ -87,10 +90,19 @@ function love.resize(w, h)
     push:resize(w, h)
 end
 
+
 function love.keypressed(key)
     
     -- add to our table of keys pressed this frame
     love.keyboard.keysPressed[key] = true
+end
+
+-- When mouse is pressed, store coordinates in a global variable
+function love.mousepressed(x, y, button, isTouch, presses)
+    mouse = {
+        ['x'] = x,
+        ['y'] = y
+    }
 end
 
 function love.keyboard.wasPressed(key)
@@ -100,6 +112,8 @@ function love.keyboard.wasPressed(key)
         return false
     end
 end
+
+
 
 function love.update(dt)
     
@@ -114,6 +128,7 @@ function love.update(dt)
     gStateMachine:update(dt)
 
     love.keyboard.keysPressed = {}
+    mouseDown = false
 end
 
 function love.draw()
@@ -123,5 +138,6 @@ function love.draw()
     love.graphics.draw(gTextures['background'], backgroundX, 0)
     
     gStateMachine:render()
+
     push:finish()
 end
