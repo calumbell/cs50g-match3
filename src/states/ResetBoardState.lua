@@ -49,8 +49,14 @@ end
 function ResetBoardState:animateAndReturn()
 	Chain(
 		function(go)
+			Timer.tween(0.5, {
+				[self] = {transitionAlpha = 255}
+			})
+			Timer.after(0.5, go)
+		end,
+
+		function(go)
 			Timer.tween(0.25, {
-				[self] = {transitionAlpha = 255},
 				[self] = {labelY = VIRTUAL_HEIGHT / 2}
 			})
 			Timer.after(0.25, go)

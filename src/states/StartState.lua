@@ -91,11 +91,15 @@ function StartState:update(dt)
             self.pauseInput = true
         end
 
+        -- get mouse x&y, if mousing over menu item, select it. on a click, begin or quit
         local mouseX, mouseY = push:toGame(love.mouse.getX(), love.mouse.getY())
 
+        -- coordinates for 'start game' button
         if 230 < mouseX and mouseX < 286 and 160 < mouseY and mouseY < 181 then
             self.currentMenuItem = 1
             if  mouseDown then self:beginGame() end
+
+        -- coordinates for 'quit' button
         elseif 211 < mouseX and mouseX < 300 and 190 < mouseY and mouseY < 205 then
             self.currentMenuItem = 2
             if mouseDown then love.event.quit() end

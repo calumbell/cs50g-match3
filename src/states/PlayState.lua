@@ -167,28 +167,29 @@ function PlayState:update(dt)
                 self.board.tiles[newTile.gridY][newTile.gridX] = newTile
 
                 -- tween coordinates between the two so they swap
-                Timer.tween(0.1, {
-                    [self.highlightedTile] = {x = newTile.x, y = newTile.y},
-                    [newTile] = {x = self.highlightedTile.x, y = self.highlightedTile.y}
-                })
-                
-                -- once the swap is finished, we can tween falling blocks as needed
-                :finish(function()
-                    self:calculateMatches()
-
-                    -- check if there are no moves possible with new board, also check to
-                    -- see whether the last match triggered a level up (we'll get a new board anyway!)
-                    if not self.board:checkForMoves() and self.score < self.scoreGoal then
-                        
-                        gStateMachine:change('reset-board', {
-                            board = self.board,
-                            timer = self.timer,
-                            score = self.score,
-                            level = self.level  
+                Chain(
+                    function(go)
+                        Timer.tween(0.1, {
+                            [self.highlightedTile] = {x = newTile.x, y = newTile.y},
+                            [newTile] = {x = self.highlightedTile.x, y = self.highlightedTile.y}
                         })
-                    end
+                        Timer.after(0.1, go)
+                    end,
 
-                end)
+                    function(go)
+                        self:calculateMatches()
+                        if not self.board:checkForMoves() and self.score < self.scoreGoal then 
+                            gStateMachine:change('reset-board', {
+                                board = self.board,
+                                timer = self.timer,
+                                score = self.score,
+                                level = self.level
+                            })
+                        end
+                    end
+                )()
+
+            
             end
         end
     end
