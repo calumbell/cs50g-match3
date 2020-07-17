@@ -39,6 +39,7 @@ require 'src/states/BeginGameState'
 require 'src/states/GameOverState'
 require 'src/states/PlayState'
 require 'src/states/StartState'
+require 'src/states/ResetBoardState'
 
 gSounds = {
     ['music'] = love.audio.newSource('sounds/music3.mp3'),

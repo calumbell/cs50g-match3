@@ -66,6 +66,8 @@ function PlayState:enter(params)
     -- grab score from params if it was passed
     self.score = params.score or 0
 
+    self.timer = params.timer or 60
+
     -- score we have to reach to get to the next level
     self.scoreGoal = self.level * 1.25 * 1000
 end
@@ -174,16 +176,16 @@ function PlayState:update(dt)
                 :finish(function()
                     self:calculateMatches()
 
-                    -- check if there are no moves possible with new board
-                    if not self.board:checkForMoves() then
-                        print('no moves possible!')
-                        self.canInput = false
-
-                        self.board:reinitializeTiles()
-
-                        Timer.after(2.5, function()
-                            self.canInput = true
-                        end)
+                    -- check if there are no moves possible with new board, also check to
+                    -- see whether the last match triggered a level up (we'll get a new board anyway!)
+                    if not self.board:checkForMoves() and self.score < self.scoreGoal then
+                        
+                        gStateMachine:change('reset-board', {
+                            board = self.board,
+                            timer = self.timer,
+                            score = self.score,
+                            level = self.level  
+                        })
                     end
 
                 end)
