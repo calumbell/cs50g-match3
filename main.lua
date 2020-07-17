@@ -47,8 +47,7 @@ BACKGROUND_SCROLL_SPEED = 80
 -- how many different colours of tiles to include in each board
 TILE_COLOURS_PER_BOARD = 8
 
--- global variable for keeping track of when the mouse is pressed
-mouse = false
+mouseDown = false
 
 function love.load()
     -- window bar title
@@ -97,13 +96,10 @@ function love.keypressed(key)
     love.keyboard.keysPressed[key] = true
 end
 
--- When mouse is pressed, store coordinates in a global variable
+
 function love.mousepressed(x, y, button, isTouch, presses)
-    mouse = {
-        ['x'] = x,
-        ['y'] = y
-    }
-end
+    mouseDown = true
+end 
 
 function love.keyboard.wasPressed(key)
     if love.keyboard.keysPressed[key] then

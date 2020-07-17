@@ -90,6 +90,22 @@ function StartState:update(dt)
             -- turn off input during transition
             self.pauseInput = true
         end
+
+        if  mouseDown then
+            local mouseX, mouseY = push:toGame(love.mouse.getX(), love.mouse.getY())
+            
+            -- click 'start game' -> begin the game
+            -- button dims. x: 230-286, y: 160-181
+            if 230 < mouseX and mouseX < 286 and 160 < mouseY and mouseY < 181 then
+                self:beginGame()
+
+            -- click 'quit' --> quit the game
+            -- button dims. x: 211-300, y: 190-205
+            elseif 211 < mouseX and mouseX < 300 and 190 < mouseY and mouseY < 205 then
+                love.event.quit()
+            end
+
+        end
     end
 
     -- update our Timer, which will be used for our fade transitions
@@ -135,7 +151,6 @@ function StartState:beginGame()
         gStateMachine:change('begin-game', {
             level = 1
         })
-
         -- remove color timer from Timer
         self.colorTimer:remove()
     end)
