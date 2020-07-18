@@ -142,7 +142,7 @@ function StartState:render()
 end
 
 --[[
-  Fades to white and begins the game  
+    Fades to white and begins the game  
 ]]
 
 function StartState:beginGame()

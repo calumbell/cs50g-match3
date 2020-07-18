@@ -126,21 +126,7 @@ function PlayState:update(dt)
         -- if the mouse has moved to a new tile, highlight it
         if mouseMoved then
             local mouseX, mouseY = push:toGame(love.mouse.getX(), love.mouse.getY())
-
-            -- iterate across rows of the table
-            for y = 1, 8 do
-                -- if mouse y-coord matches the range for this row, check x coord
-                if mouseY > 32*(y-1)+self.board.y and mouseY < 32*(y)+self.board.y then
-
-                    -- if mouse x-coord matches the range for this column, highlight
-                    for x = 1, 8 do
-                        if mouseX > 32*(x-1)+self.board.x and mouseX < 32*(x)+self.board.x then
-                            self.boardHighlightY = y - 1
-                            self.boardHighlightX = x - 1
-                        end
-                    end
-                end
-            end
+            self.boardHighlightX, self.boardHighlightY = self:mouseTileSelection(mouseX, mouseY)
         end
 
         -- if we've pressed enter, to select or deselect a tile...
@@ -172,7 +158,7 @@ function PlayState:update(dt)
                 -- if we reach this point, the tile swap is valid
 
                 -- swap the two tiles
-                self:swapTiles(self.highlightedTile, self.board.tiles[y][x])
+                self:swapTiles(self.highlightedTile, self.board.tiles[y][x], self.board.tiles)
 
                 -- recursively calculate and handle any tile matches that occur
                 self:calculateMatches()
@@ -281,7 +267,13 @@ function PlayState:calculateMatches()
     end
 end
 
-function PlayState:swapTiles(tileOne, tileTwo)
+--[[
+    Swaps tileOne and tileTwo in the 2D array tiles. Tiles requires the following
+    fields: x, y (the coordinates to render the tiles), gridX, gridY (array indices
+    of each tile in the array)
+]]
+
+function PlayState:swapTiles(tileOne, tileTwo, tiles)
     local tempTile = tileOne
     local tempX = tempTile.gridX
     local tempY = tempTile.gridY
@@ -293,8 +285,8 @@ function PlayState:swapTiles(tileOne, tileTwo)
     tileTwo.gridY = tempY
 
     -- then swap their positions in the 2D array
-    self.board.tiles[tileOne.gridY][tileOne.gridX] = tileOne
-    self.board.tiles[tileTwo.gridY][tileTwo.gridX] = tileTwo
+    tiles[tileOne.gridY][tileOne.gridX] = tileOne
+    tiles[tileTwo.gridY][tileTwo.gridX] = tileTwo
 
     Timer.tween(0.1, {
         [tileOne] = {x = tileTwo.x, y = tileTwo.y},
@@ -304,3 +296,26 @@ function PlayState:swapTiles(tileOne, tileTwo)
         return
     end)
 end
+
+function PlayState:mouseTileSelection(mouseX, mouseY)
+    -- iterate across rows of the table
+    for y = 1, 8 do
+        -- if mouse y-coord matches the range for this row, check x coord
+        if mouseY > 32*(y-1)+self.board.y and mouseY < 32*(y)+self.board.y then
+
+            -- if mouse x-coord matches the range for this column, highlight
+            for x = 1, 8 do
+                if mouseX > 32*(x-1)+self.board.x and mouseX < 32*(x)+self.board.x then
+                    if not(self.boardHighlightY == y - 1 and self.boardHighlightX == x - 1) then
+                        gSounds['mouse-hover-click']:play()
+                        return x-1, y-1     
+                    end
+            
+                end
+            end
+        end
+    end
+
+    return self.boardHighlightX, self.boardHighlightY
+end
+
