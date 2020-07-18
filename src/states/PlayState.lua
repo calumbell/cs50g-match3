@@ -147,49 +147,25 @@ function PlayState:update(dt)
             elseif not self.board:checkForMatch(x, y, self.highlightedTile.gridX, self.highlightedTile.gridY) then
                 gSounds['error']:play()
                 self.highlightedTile = nil
+
             else
-                
-                -- swap grid positions of tiles
-                local tempX = self.highlightedTile.gridX
-                local tempY = self.highlightedTile.gridY
+                -- if we reach this point, the tile swap is valid
 
-                local newTile = self.board.tiles[y][x]
+                -- swap the two tiles
+                self:swapTiles(self.highlightedTile, self.board.tiles[y][x])
 
-                self.highlightedTile.gridX = newTile.gridX
-                self.highlightedTile.gridY = newTile.gridY
-                newTile.gridX = tempX
-                newTile.gridY = tempY
+                -- recursively calculate and handle any tile matches that occur
+                self:calculateMatches()
 
-                -- swap tiles in the tiles table
-                self.board.tiles[self.highlightedTile.gridY][self.highlightedTile.gridX] =
-                    self.highlightedTile
-
-                self.board.tiles[newTile.gridY][newTile.gridX] = newTile
-
-                -- tween coordinates between the two so they swap
-                Chain(
-                    function(go)
-                        Timer.tween(0.1, {
-                            [self.highlightedTile] = {x = newTile.x, y = newTile.y},
-                            [newTile] = {x = self.highlightedTile.x, y = self.highlightedTile.y}
-                        })
-                        Timer.after(0.1, go)
-                    end,
-
-                    function(go)
-                        self:calculateMatches()
-                        if not self.board:checkForMoves() and self.score < self.scoreGoal then 
-                            gStateMachine:change('reset-board', {
-                                board = self.board,
-                                timer = self.timer,
-                                score = self.score,
-                                level = self.level
-                            })
-                        end
-                    end
-                )()
-
-            
+                -- check for possible moves, if there are none reset the board
+                if not self.board:checkForMoves() and self.score < self.scoreGoal then 
+                    gStateMachine:change('reset-board', {
+                        board = self.board,
+                        timer = self.timer,
+                        score = self.score,
+                        level = self.level
+                    })
+                end
             end
         end
     end
@@ -197,6 +173,48 @@ function PlayState:update(dt)
     Timer.update(dt)
 
     self.board:update(dt)
+end
+
+function PlayState:render()
+    -- render board of tiles
+    self.board:render()
+
+    -- render highlighted tile if it exists
+    if self.highlightedTile then
+        
+        -- multiply so drawing white rect makes it brighter
+        love.graphics.setBlendMode('add')
+
+        love.graphics.setColor(255, 255, 255, 96)
+        love.graphics.rectangle('fill', (self.highlightedTile.gridX - 1) * 32 + (VIRTUAL_WIDTH - 272),
+            (self.highlightedTile.gridY - 1) * 32 + 16, 32, 32, 4)
+
+        -- back to alpha
+        love.graphics.setBlendMode('alpha')
+    end
+
+    -- render highlight rect color based on timer
+    if self.rectHighlighted then
+        love.graphics.setColor(217, 87, 99, 255)
+    else
+        love.graphics.setColor(172, 50, 50, 255)
+    end
+
+    -- draw actual cursor rect
+    love.graphics.setLineWidth(4)
+    love.graphics.rectangle('line', self.boardHighlightX * 32 + (VIRTUAL_WIDTH - 272),
+        self.boardHighlightY * 32 + 16, 32, 32, 4)
+
+    -- GUI text
+    love.graphics.setColor(56, 56, 56, 234)
+    love.graphics.rectangle('fill', 16, 16, 186, 116, 4)
+
+    love.graphics.setColor(99, 155, 255, 255)
+    love.graphics.setFont(gFonts['medium'])
+    love.graphics.printf('Level: ' .. tostring(self.level), 20, 24, 182, 'center')
+    love.graphics.printf('Score: ' .. tostring(self.score), 20, 52, 182, 'center')
+    love.graphics.printf('Goal : ' .. tostring(self.scoreGoal), 20, 80, 182, 'center')
+    love.graphics.printf('Timer: ' .. tostring(self.timer), 20, 108, 182, 'center')
 end
 
 --[[
@@ -243,44 +261,26 @@ function PlayState:calculateMatches()
     end
 end
 
-function PlayState:render()
-    -- render board of tiles
-    self.board:render()
+function PlayState:swapTiles(tileOne, tileTwo)
+    local tempTile = tileOne
+    local tempX = tempTile.gridX
+    local tempY = tempTile.gridY
 
-    -- render highlighted tile if it exists
-    if self.highlightedTile then
-        
-        -- multiply so drawing white rect makes it brighter
-        love.graphics.setBlendMode('add')
+    -- first swap the coordinates of the tiles
+    tileOne.gridX = tileTwo.gridX
+    tileOne.gridY = tileTwo.gridY
+    tileTwo.gridX = tempX
+    tileTwo.gridY = tempY
 
-        love.graphics.setColor(255, 255, 255, 96)
-        love.graphics.rectangle('fill', (self.highlightedTile.gridX - 1) * 32 + (VIRTUAL_WIDTH - 272),
-            (self.highlightedTile.gridY - 1) * 32 + 16, 32, 32, 4)
+    -- then swap their positions in the 2D array
+    self.board.tiles[tileOne.gridY][tileOne.gridX] = tileOne
+    self.board.tiles[tileTwo.gridY][tileTwo.gridX] = tileTwo
 
-        -- back to alpha
-        love.graphics.setBlendMode('alpha')
-    end
+    Timer.tween(0.1, {
+        [tileOne] = {x = tileTwo.x, y = tileTwo.y},
+        [tileTwo] = {x = tileOne.x, y = tileOne.y}
 
-    -- render highlight rect color based on timer
-    if self.rectHighlighted then
-        love.graphics.setColor(217, 87, 99, 255)
-    else
-        love.graphics.setColor(172, 50, 50, 255)
-    end
-
-    -- draw actual cursor rect
-    love.graphics.setLineWidth(4)
-    love.graphics.rectangle('line', self.boardHighlightX * 32 + (VIRTUAL_WIDTH - 272),
-        self.boardHighlightY * 32 + 16, 32, 32, 4)
-
-    -- GUI text
-    love.graphics.setColor(56, 56, 56, 234)
-    love.graphics.rectangle('fill', 16, 16, 186, 116, 4)
-
-    love.graphics.setColor(99, 155, 255, 255)
-    love.graphics.setFont(gFonts['medium'])
-    love.graphics.printf('Level: ' .. tostring(self.level), 20, 24, 182, 'center')
-    love.graphics.printf('Score: ' .. tostring(self.score), 20, 52, 182, 'center')
-    love.graphics.printf('Goal : ' .. tostring(self.scoreGoal), 20, 80, 182, 'center')
-    love.graphics.printf('Timer: ' .. tostring(self.timer), 20, 108, 182, 'center')
+    }):finish(function()
+        return
+    end)
 end
