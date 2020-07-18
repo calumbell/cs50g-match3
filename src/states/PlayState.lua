@@ -139,10 +139,12 @@ function PlayState:update(dt)
             -- if nothing is highlighted, highlight current tile
             if not self.highlightedTile then
                 self.highlightedTile = self.board.tiles[y][x]
+                gSounds['tile-select']:play()
 
             -- if we select the position already highlighted, remove highlight
             elseif self.highlightedTile == self.board.tiles[y][x] then
                 self.highlightedTile = nil
+                gSounds['tile-deselect']:play()
 
             -- if the difference between X and Y combined of this highlighted tile
             -- vs the previous is not equal to 1, also remove highlight

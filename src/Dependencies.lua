@@ -51,7 +51,9 @@ gSounds = {
     ['clock'] = love.audio.newSource('sounds/clock.wav'),
     ['game-over'] = love.audio.newSource('sounds/game-over.wav'),
     ['next-level'] = love.audio.newSource('sounds/next-level.wav'),
-    ['mouse-hover-click'] = love.audio.newSource('sounds/mouse-hover-click.wav')
+    ['mouse-hover-click'] = love.audio.newSource('sounds/mouse-hover-click.wav'),
+    ['tile-select'] = love.audio.newSource('sounds/tile-select-click.wav'),
+    ['tile-deselect'] = love.audio.newSource('sounds/tile-deselect.wav')
 }
 
 gTextures = {
