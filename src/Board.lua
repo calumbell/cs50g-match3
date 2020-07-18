@@ -185,24 +185,22 @@ function Board:calculateMatches()
                 if matchNum >= 3 then
                     local match = {}
 
-                    -- check if any tile in our match is shiny
-                    local shinyFound = false
+
+                    -- iterate across all tiles in the match
                     for y2 = y - 1, y - matchNum, -1 do
-                        if self.tiles[y2][x].shiny then shinyFound = true end
-                    end
 
-                    -- if we found no shiny in the match, remove the matched tiles
-                    if not shinyFound then
-                        for y2 = y - 1, y - matchNum, -1 do
-                            table.insert(match, self.tiles[y2][x])
-                        end
+                        -- add each tile to the match table
+                        table.insert(match, self.tiles[y2][x])
 
-                    -- if we found a shiny remove the whole row
-                    else
-                        for y2 = 1, 8 do
-                            table.insert(match, self.tiles[y2][x])
+                        -- if tile is shiny, also add the row it is part of
+                        if self.tiles[y2][x].shiny then
+                            for x2 = 1, 8 do
+                                table.insert(match, self.tiles[y2][x2])
+                            end
                         end
                     end
+
+
 
                     table.insert(matches, match)
                 end
@@ -220,22 +218,17 @@ function Board:calculateMatches()
         if matchNum >= 3 then
             local match = {}
             
-            local shinyFound = false
+            -- iterate across all tiles in the match
             for y2 = 8, 8 - matchNum + 1, -1 do
-                if self.tiles[y2][x].shiny then shinyFound = true end
-            end
 
-            -- if there is no shiny in match, remove all tiles in the match
-            if not shinyFound then
-                -- go backwards from end of last row by matchNum
-                for y2 = 8, 8 - matchNum + 1, -1 do
-                    table.insert(match, self.tiles[y2][x])
-                end
+                -- add each tile to the match table
+                table.insert(match, self.tiles[y2][x])
 
-            -- if we found a shiny remove the whole column
-            else
-                for y2 = 1, 8 do
-                    table.insert(match, self.tiles[y2][x])
+                -- if tile is shiny, also add the row it is part of
+                if self.tiles[y2][x].shiny then
+                    for x2 = 1, 8 do
+                        table.insert(match, self.tiles[y2][x2])
+                    end
                 end
             end
 
