@@ -63,7 +63,7 @@ function ResetBoardState:animateAndReturn()
 		end,
 
 		function(go)
-			self.board:initializeTiles()
+			self.board:initializeTiles(self.level)
 			Timer.after(0.75, go)
 		end,
 

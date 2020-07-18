@@ -34,12 +34,12 @@ function Board:init(x, y, level)
 
     self.transitionAlpha = 255
 
-    self:initializeTiles()
+    self:initializeTiles(level)
 end
 
 
 
-function Board:initializeTiles()
+function Board:initializeTiles(level)
     self.tiles = {}
 
     -- iterate over rows
@@ -50,14 +50,8 @@ function Board:initializeTiles()
 
         -- iterate over tiles in a row
         for tileX = 1, 8 do
-            
-            if self.level == 1 then
-                -- if first level, all tiles are flat (variety 1)
-                table.insert(self.tiles[tileY], Tile(tileX, tileY, self.colours[math.random(#self.colours)], 1))
-            else
-                -- else, randomise tile variety (1-6)
-                table.insert(self.tiles[tileY], Tile(tileX, tileY, self.colours[math.random(#self.colours)], math.random(6)))
-            end
+            local variety = math.random(math.min(level, 6))
+            table.insert(self.tiles[tileY], Tile(tileX, tileY, self.colours[math.random(#self.colours)], variety))
         end
     end
 
@@ -65,17 +59,17 @@ function Board:initializeTiles()
         
         -- recursively initialize if matches were returned so we always have
         -- a matchless board on start
-        self:initializeTiles()
+        self:initializeTiles(level)
     end
 end
 
 
-function Board:reinitializeTiles()
+function Board:reinitializeTiles(level)
     Timer.tween(1, {
         [self] = {transitionAlpha = 0}
     })
     :finish(function ()
-        self:initializeTiles()
+        self:initializeTiles(level)
         Timer.tween(1, {
             [self] = {transitionAlpha = 255}
         })
@@ -368,7 +362,7 @@ function Board:getFallingTiles()
             if not tile then
 
                 -- new tile with random color and variety
-                local tile = Tile(x, y, self.colours[math.random(#self.colours)], math.random(6))
+                local tile = Tile(x, y, self.colours[math.random(#self.colours)], math.min(math.random(self.level+1), 6))
                 tile.y = -32
                 self.tiles[y][x] = tile
 
