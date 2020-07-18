@@ -144,7 +144,7 @@ function PlayState:update(dt)
         end
 
         -- if we've pressed enter, to select or deselect a tile...
-        if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
+        if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') or mouseDown then
             
             -- if same tile as currently highlighted, deselect
             local x = self.boardHighlightX + 1
