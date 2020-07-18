@@ -123,6 +123,26 @@ function PlayState:update(dt)
             gSounds['select']:play()
         end
 
+        -- if the mouse has moved to a new tile, highlight it
+        if mouseMoved then
+            local mouseX, mouseY = push:toGame(love.mouse.getX(), love.mouse.getY())
+
+            -- iterate across rows of the table
+            for y = 1, 8 do
+                -- if mouse y-coord matches the range for this row, check x coord
+                if mouseY > 32*(y-1)+self.board.y and mouseY < 32*(y)+self.board.y then
+
+                    -- if mouse x-coord matches the range for this column, highlight
+                    for x = 1, 8 do
+                        if mouseX > 32*(x-1)+self.board.x and mouseX < 32*(x)+self.board.x then
+                            self.boardHighlightY = y - 1
+                            self.boardHighlightX = x - 1
+                        end
+                    end
+                end
+            end
+        end
+
         -- if we've pressed enter, to select or deselect a tile...
         if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
             

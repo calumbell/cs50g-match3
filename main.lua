@@ -47,7 +47,9 @@ BACKGROUND_SCROLL_SPEED = 80
 -- how many different colours of tiles to include in each board
 TILE_COLOURS_PER_BOARD = 8
 
+-- global flags for mouse control
 mouseDown = false
+mouseMoved = false
 
 function love.load()
     -- window bar title
@@ -101,6 +103,10 @@ function love.mousepressed(x, y, button, isTouch, presses)
     mouseDown = true
 end 
 
+function love.mousemoved(x, y, dx, dy, istouch)
+    mouseMoved = true
+end
+
 function love.keyboard.wasPressed(key)
     if love.keyboard.keysPressed[key] then
         return true
@@ -125,6 +131,7 @@ function love.update(dt)
 
     love.keyboard.keysPressed = {}
     mouseDown = false
+    mouseMoved = false
 end
 
 function love.draw()
