@@ -1,12 +1,37 @@
-# Match3
+# Breakout
 
-This is my submission for assignment number 3 of CS50G. For this exercise, we were provided with the following distro code and asked to implement several new features:
+Project 3 of [CS50's Introduction to Games Development](https://cs50.harvard.edu/games/2018/)
 
-https://cdn.cs50.net/games/2019/x/assignments/3/assignment3.zip
+Match3 is a [tile-matching game](https://en.wikipedia.org/wiki/Tile-matching_video_game) created in the [LÖVE2D](https://love2d.org/) engine.
+
+[Full project specification](https://cs50.harvard.edu/games/2018/projects/3/match/)
+
+## Setup
+
+First, clone this repository:
+
+```bash
+git clone https://github.com/calumbell/cs50g-match3
+```
+
+Install LÖVE2D - instructions can be found [here](https://love2d.org/wiki/Getting_Started)
+
+To run the game:
+
+```bash
+cd match3
+love .
+```
+
+## Visuals
+
+You can watch a video demonstration of this project in action [here](https://youtu.be/X_m0xbC8xOE).
 
 
-- Implement time addition on matches.
-- Ensure level 1 begins with simple flat blocks, different blocks spawn at high levels.
-- Create random shiny versions of blocks that will destroy an entire row on match.
-- Only allow swapping when it results in a match.
-- Implement mouse control.
+<img src="graphics/screenshots/match3-screenshot-title.png" width=400>
+<img src="graphics/screenshots/match3-screenshot-PlayState.png" width=400>
+
+## Requirements
+Match3 was built using the [LÖVE2D](https://love2d.org/) engine.
+
+[Push](https://github.com/Ulydev/push) was used for resolution-handling, [hump](https://github.com/vrld/hump/blob/master/class.lua) was used for Lua object-orientation, and [Knife](https://github.com/airstruck/knife) was used to handle asynchronous code, chained functions, and tweening.
